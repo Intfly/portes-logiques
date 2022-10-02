@@ -94,11 +94,13 @@ class Nombre(Gate):
         return Nombre(resultat, True)._versBase16()
 
     def _versBase16(self):
-        return int(self.nombre,2)
+        #return int(self.nombre,2)
+        print(self.nombre)
         base16 = 0
         for i in range(8):
+            print(base16)
             base16+= (int(self.nombre[7-i])**7-i)
-        return Nombre(base16,False)
+        return base16
 
 
 #               TESTS               #
