@@ -53,7 +53,6 @@ class Gate:
         return Gate(self._logic_xor(Q)._logic_not().booleen)
 
     def circuit_additionneur(self,Q,Cin):
-        #print(self, Q, Cin)
         E1 = self._logic_xor(Q)
         S = E1._logic_xor(Cin).booleen
         E2 = E1._logic_and(Cin)
@@ -81,11 +80,11 @@ class Nombre(Gate):
                 binaire+="0"
         return binaire
         
-    def addition(self,Nombre2):
+    def __add__(self,Nombre2):
         N1 = self.nombre
         N2 = Nombre2.nombre
         inter = (0,0)
-        resultat =""
+        resultat = ""
         for i in range(8):
             P = Gate(int(N1[len(N1)-i-1]))
             Q = Gate(int(N2[len(N2)-i-1]))
@@ -95,6 +94,7 @@ class Nombre(Gate):
         return Nombre(resultat, True)._versBase16()
 
     def _versBase16(self):
+        return int(self.nombre,2)
         base16 = 0
         for i in range(8):
             base16+= (int(self.nombre[7-i])**7-i)
@@ -116,14 +116,14 @@ Cin: Gate = Gate(True)
 #print(P.circuit_additionneur(Q, Cin))
 
 N1: Nombre = Nombre("00000001",True)
-N2: Nombre = Nombre("00100011",True)
+N2: Nombre = Nombre("00001000",True)
 #print(N2.addition(N1))
+#print(N2._versBase16())
 
 R1: Nombre = Nombre(15,False)
 R2: Nombre = Nombre(1,False)
-#print(R1.addition(R2))
+print(R1 + R2)
 
-print(N1._versBase16())
 
 
 
