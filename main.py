@@ -1,5 +1,5 @@
 """
-modélisation du passage de courrant par un booléen
+modélisation du passage du courrant par un booléen
 """
 
 class Gate:
@@ -53,6 +53,7 @@ class Gate:
         return Gate(self._logic_xor(Q)._logic_not().booleen)
 
     def circuit_additionneur(self,Q,Cin):
+        #print(self, Q, Cin)
         E1 = self._logic_xor(Q)
         S = E1._logic_xor(Cin).booleen
         E2 = E1._logic_and(Cin)
@@ -61,12 +62,14 @@ class Gate:
         return Cout, S
     
 class Nombre(Gate):
-    
     def __init__(self,Nombre,est_binaire):
         if est_binaire:
             self.nombre = Nombre
         else:
             self.nombre = self._versBinaire(Nombre)
+
+    def __str__(self):
+        return f"la valeur vaut: {self.nombre}"
 
     def _versBinaire(self, Nombre):
         binaire:str = ""
@@ -77,20 +80,32 @@ class Nombre(Gate):
             else:
                 binaire+="0"
         return binaire
-
+        
     def addition(self,Nombre2):
         N1 = self.nombre
         N2 = Nombre2.nombre
-        N3 = "00000000"
+        inter = (0,0)
+        resultat =""
         for i in range(8):
-            N3[len(N3)-i-1] = Gate(bool(N1[len(N1)-i-1])).circuit_additionneur(Gate(bool(N2[len(N2)-i-1])),Gate(bool(N3[len(N3)-i-1])))
-        return N3
+            P = Gate(int(N1[len(N1)-i-1]))
+            Q = Gate(int(N2[len(N2)-i-1]))
+            Cin = Gate(bool(int(inter[0])))
+            inter = P.circuit_additionneur(Q,Cin)
+            resultat = str(int(inter[1])) + resultat
+        return Nombre(resultat, True)._versBase16()
+
+    def _versBase16(self):
+        base16 = 0
+        for i in range(8):
+            base16+= (int(self.nombre[7-i])**7-i)
+        return Nombre(base16,False)
 
 
+#               TESTS               #
 
 P: Gate = Gate(True)
-Q: Gate = Gate(False)
-Cin: Gate = Gate(False)
+Q: Gate = Gate(True)
+Cin: Gate = Gate(True)
 #print(P._logic_not())
 #print(P._logic_nand(Q))
 #print(P._logic_nor(Q))
@@ -100,9 +115,19 @@ Cin: Gate = Gate(False)
 #print(P._logic_xnor(Q))
 #print(P.circuit_additionneur(Q, Cin))
 
-N1: Nombre = Nombre(15,False)
-N2: Nombre = Nombre("0010010",True)
-print(N2.addition(N1))
+N1: Nombre = Nombre("00000001",True)
+N2: Nombre = Nombre("00100011",True)
+#print(N2.addition(N1))
+
+R1: Nombre = Nombre(15,False)
+R2: Nombre = Nombre(1,False)
+#print(R1.addition(R2))
+
+print(N1._versBase16())
+
+
+
+
 
 
  
