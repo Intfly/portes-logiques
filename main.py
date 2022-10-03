@@ -92,6 +92,13 @@ class Nombre(Gate):
             inter = P.circuit_additionneur(Q,Cin)
             resultat = str(int(inter[1])) + resultat
         return Nombre(resultat, True)._versBase16()
+    
+    def __mul__(self,Nombre2):
+        tot = Nombre(0,False)
+        for _ in range(int(Nombre2.nombre)):
+            tot.nombre = tot + self
+        return tot._versBase16()
+
 
     def _versBase16(self):
         return int(self.nombre,2)
@@ -141,6 +148,7 @@ N2: Nombre = Nombre("000001111",True)
 #print(N2._versBase16())
 
 R1: Nombre = Nombre(15,False)
-R2: Nombre = Nombre(1,False)
+R2: Nombre = Nombre(2,False)
 
-print(stats(2000))
+#print(stats(2000))
+print(R1 + R2)
