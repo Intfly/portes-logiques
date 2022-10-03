@@ -94,7 +94,7 @@ class Nombre(Gate):
         return Nombre(resultat, True)._versBase16()
 
     def _versBase16(self):
-        #return int(self.nombre,2)
+        return int(self.nombre,2)
         print(self.nombre)
         base16 = 0
         for i in range(8):
@@ -102,6 +102,24 @@ class Nombre(Gate):
             base16+= (int(self.nombre[7-i])**7-i)
         return base16
 
+import time
+
+def stats(iter):
+    t1= []
+    t2= []
+    for _ in range(iter):
+        dbt = time.perf_counter()
+        R1 + R2
+        t1.append(time.perf_counter() - dbt)
+        dbt2 = time.perf_counter()
+        15+1
+        t2.append(time.perf_counter() - dbt2)
+    m1=0
+    m2=0
+    for i in range(len(t1)):
+        m1+= t1[i]
+        m2 += t2[i]
+    return m1/len(t1)*10000, m2/len(t2)*10000
 
 #               TESTS               #
 
@@ -118,18 +136,11 @@ Cin: Gate = Gate(True)
 #print(P.circuit_additionneur(Q, Cin))
 
 N1: Nombre = Nombre("00000001",True)
-N2: Nombre = Nombre("00001000",True)
+N2: Nombre = Nombre("000001111",True)
 #print(N2.addition(N1))
 #print(N2._versBase16())
 
 R1: Nombre = Nombre(15,False)
 R2: Nombre = Nombre(1,False)
-print(R1 + R2)
 
-
-
-
-
-
-
- 
+print(stats(2000))
