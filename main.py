@@ -111,10 +111,10 @@ class Nombre(Gate):
 
 import time
 
-def stats(iter):
+def stats(iterations):
     t1= []
     t2= []
-    for _ in range(iter):
+    for _ in range(iterations):
         dbt = time.perf_counter()
         R1 + R2
         t1.append(time.perf_counter() - dbt)
