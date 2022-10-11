@@ -63,44 +63,30 @@ class Gate:
     
 class Nombre(Gate):
     def __init__(self,Nombre,est_binaire):
-        self._longueur = self._calculLongueur(Nombre,est_binaire)
         if est_binaire:
             self.nombre = Nombre
         else:
             self.nombre = self._versBinaire(Nombre)
-        self._est_binaire = True
 
     def __str__(self):
-        return f"la valeur de l'objet vaut: {self.nombre}"
+        return f"la valeur vaut: {self.nombre}"
 
-    def _calculLongueur(self,nombre,est_binaire):
-        if est_binaire:
-            return len(nombre)
-        else:
-            l:int = 0
-            nombre = int(nombre)
-            while nombre-(2**l)>= nombre/2:
-                l+=1
-            l+=1
-            return l
-
-    def _versBinaire(self, nombre):
+    def _versBinaire(self,nombre):
         binaire:str = ""
-        for i in range(self._longueur):
-            if nombre >= 2**(self._longueur-i-1):
+        for i in range(8):
+            if nombre >= 2**(8-i-1):
                 binaire+="1"
-                nombre -=(2**(self._longueur-i-1))
+                nombre -=(2**(8-i-1))
             else:
                 binaire+="0"
         return binaire
         
-    def __add__(self, Nombre2):
+    def __add__(self,Nombre2):
         N1 = self.nombre
         N2 = Nombre2.nombre
         inter = (0,0)
         resultat = ""
-        #trouver plus grand et rajouter 0 à droite du nombre le plus petit 
-        for i in range(self._longueur):
+        for i in range(8):
             P = Gate(int(N1[len(N1)-i-1]))
             Q = Gate(int(N2[len(N2)-i-1]))
             Cin = Gate(bool(int(inter[0])))
@@ -124,16 +110,15 @@ class Nombre(Gate):
             base16+= (int(self.nombre[7-i])**7-i)
         return base16
     
-    def stats(self, nombre2, iterations):
+    def stats(self, iterations):
         t1= []
         t2= []
         for _ in range(iterations):
             dbt = time.perf_counter()
-            self + nombre2
+            R1 + R2
             t1.append(time.perf_counter() - dbt)
-            N1,N2 = self.nombre,nombre2.nombre
             dbt2 = time.perf_counter()
-            N1 + N2
+            15+1
             t2.append(time.perf_counter() - dbt2)
         m1=0
         m2=0
@@ -159,14 +144,31 @@ Cin: Gate = Gate(True)
 #print(P._logic_xnor(Q))
 #print(P.circuit_additionneur(Q, Cin))
 
-N1: Nombre = Nombre("1",True)
-N2: Nombre = Nombre("1111",True)
+N1: Nombre = Nombre("00000001",True)
+N2: Nombre = Nombre("000001111",True)
 #print(N2.addition(N1))
 #print(N2._versBase16())
 
-R1: Nombre = Nombre(31,False)
+R1: Nombre = Nombre(15,False)
 R2: Nombre = Nombre(2,False)
 
-#print(N1.stats(N2,100000))
-print(R1 + R2)
-#print(N2._longueur)
+#print(N1.stats(200000))
+#print(R1 + R2)
+
+
+def binaire2(nombre):
+    y:int = 0
+    while nombre-(2**y)>= nombre/2:
+        y+=1
+    y+=1
+    binaire:str = ""
+    for i in range(y):
+        if nombre >= 2**(y-i-1):
+            binaire+="1"
+            nombre -=(2**(y-i-1))
+        else:
+            binaire+="0"
+    return binaire
+
+x=16
+print(binaire2(x))
