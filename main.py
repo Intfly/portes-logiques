@@ -71,7 +71,7 @@ class Nombre(Gate):
         self._est_binaire = True
 
     def __str__(self):
-        return f"la valeur de l'objet vaut: {self.nombre}"
+        return f"la valeur de l'instance est: {self.nombre}"
 
     def _calculLongueur(self,nombre,est_binaire):
         if est_binaire:
@@ -95,34 +95,48 @@ class Nombre(Gate):
         return binaire
         
     def __add__(self, Nombre2):
-        N1 = self.nombre
-        N2 = Nombre2.nombre
+        N1:str = "0"+str(self.nombre)#un 0 au début permet de palier les problèmes de dépassements si le nombre en binaire ne comporte que des bits True
+        N2:str = "0"+str(Nombre2.nombre)
         inter = (0,0)
         resultat = ""
-        #trouver plus grand et rajouter 0 à droite du nombre le plus petit 
-        for i in range(self._longueur):
+        if Nombre2._longueur > self._longueur:
+            longueurMax = Nombre2._longueur
+            N1 = "0"*(longueurMax-self._longueur) + N1#ajoute un 0 au début du nombre le plus petit afin de qu'ils aient la même longueur
+        else:
+            longueurMax = self._longueur
+            N2 = "0"*(longueurMax-Nombre2._longueur) + N2
+        for i in range(self._longueur+1):
             P = Gate(int(N1[len(N1)-i-1]))
             Q = Gate(int(N2[len(N2)-i-1]))
             Cin = Gate(bool(int(inter[0])))
             inter = P.circuit_additionneur(Q,Cin)
             resultat = str(int(inter[1])) + resultat
-        return Nombre(resultat, True)._versBase16()
+        return Nombre(resultat, True)._versBase16(longueurMax+1)#incrémentation nécessaire afin de ne pas effectuer de dépassements
     
     def __mul__(self,Nombre2):
-        tot = Nombre(0,False)
-        for _ in range(int(Nombre2.nombre)):
-            tot.nombre = tot + self
-        return tot._versBase16()
+        if Nombre2._longueur > self._longueur:
+            longueurMax = Nombre2._longueur
+        else:
+            longueurMax = self._longueur
+        total = Nombre(0,False)
+        print(self, Nombre2)
+        for _ in range(Nombre2._versBase16(longueurMax)):
+            print(total,self)
+            total.nombre = total + self
+        return total._versBase16(longueurMax)
 
 
-    def _versBase16(self):
-        return int(self.nombre,2)
-        print(self.nombre)
+    def _versBase16(self,longueur):
+        return int(str(self.nombre),2)#la méthode int() peut uniquement convertir des String en int, la type de self.nombre est un integer, il faut donc le convertir en string afin de le reconvertir en base 2
         base16 = 0
-        for i in range(8):
-            print(base16)
-            base16+= (int(self.nombre[7-i])**7-i)
+        for i in range(longueur):
+            print(i,longueur,self.nombre[i])
+            base16+= int(self.nombre[i])*2**(longueur-i-1)
         return base16
+        """
+        sinon, la méthode int() possède un argument optionnel permettant la conversion de son argument requis en base 16. Nous pouvons simplement écrire:
+        
+        """
     
     def stats(self, nombre2, iterations):
         t1= []
@@ -164,9 +178,9 @@ N2: Nombre = Nombre("1111",True)
 #print(N2.addition(N1))
 #print(N2._versBase16())
 
-R1: Nombre = Nombre(31,False)
-R2: Nombre = Nombre(2,False)
+R1: Nombre = Nombre(3,False)
+R2: Nombre = Nombre(1,False)
 
 #print(N1.stats(N2,100000))
-print(R1 + R2)
+print(R1 * R2)
 #print(N2._longueur)

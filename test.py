@@ -171,4 +171,8 @@ def binaire2(nombre):
     return binaire
 
 x=16
-print(binaire2(x))
+#print(binaire2(x))
+
+s1 = "oui"
+s1 = "0"*5 +s1
+print(s1)
