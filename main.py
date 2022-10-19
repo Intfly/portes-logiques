@@ -2,6 +2,8 @@
 modélisation du passage du courrant par un booléen
 """
 import time
+import flet
+from flet import Page,Text,Row,Column,ElevatedButton,TextButton,TextField
 
 class Gate:
     def __init__(self,valeur_bouleenne: bool):
@@ -26,8 +28,8 @@ class Gate:
         """
 
     def _logic_nor(self, Q):
-        if Gate(self.booleen)._logic_not().booleen:           
-            if Gate(Q.booleen)._logic_not().booleen:
+        if self._logic_not().booleen:           
+            if Q._logic_not().booleen:
                 return Gate(True)     
         return Gate(False)
         """
@@ -38,20 +40,20 @@ class Gate:
     def _logic_and(self,Q):
         A = self._logic_nor(self)
         B = Q._logic_nor(Q)
-        return Gate(A._logic_nor(B).booleen)
+        return A._logic_nor(B)
 
     def _logic_or(self,Q):
         A = self._logic_nand(self)
         B = Q._logic_nand(Q)
-        return Gate(A._logic_nand(B).booleen)
+        return A._logic_nand(B)
 
     def _logic_xor(self,Q):
         A = self._logic_and(Q._logic_not())
         B = Q._logic_and(self._logic_not())
-        return Gate(A._logic_or(B).booleen)
+        return A._logic_or(B)
 
     def _logic_xnor(self,Q):
-        return Gate(self._logic_xor(Q)._logic_not().booleen)
+        return self._logic_xor(Q)._logic_not()
 
     def circuit_additionneur(self,Q,Cin):
         E1 = self._logic_xor(Q)
@@ -74,9 +76,9 @@ class Nombre(Gate):
         return f"la valeur de l'instance est: {self.nombre}"
 
     def _calculLongueur(self,nombre,est_binaire):
-        if est_binaire:
+        if est_binaire:#si il est binaire alors on renvoie la longueur de la string
             return len(nombre)
-        else:
+        else: #sinon on regarde la puissance de 2 la plus élevée du nombre
             l:int = 0
             nombre = int(nombre)
             while nombre-(2**l)>= nombre/2:
@@ -112,18 +114,6 @@ class Nombre(Gate):
             inter = P.circuit_additionneur(Q,Cin)
             resultat = str(int(inter[1])) + resultat
         return Nombre(resultat, True)._versBase16(longueurMax+1)#incrémentation nécessaire afin de ne pas effectuer de dépassements
-    
-    def __mul__(self,Nombre2):
-        if Nombre2._longueur > self._longueur:
-            longueurMax = Nombre2._longueur
-        else:
-            longueurMax = self._longueur
-        total = Nombre(0,False)
-        print(self, Nombre2)
-        for _ in range(Nombre2._versBase16(longueurMax)):
-            print(total,self)
-            total.nombre = total + self
-        return total._versBase16(longueurMax)
 
 
     def _versBase16(self,longueur):
@@ -162,7 +152,7 @@ class Nombre(Gate):
 #               TESTS               #
 
 P: Gate = Gate(True)
-Q: Gate = Gate(True)
+Q: Gate = Gate(False)
 Cin: Gate = Gate(True)
 #print(P._logic_not())
 #print(P._logic_nand(Q))
@@ -173,14 +163,31 @@ Cin: Gate = Gate(True)
 #print(P._logic_xnor(Q))
 #print(P.circuit_additionneur(Q, Cin))
 
-N1: Nombre = Nombre("1",True)
+N1: Nombre = Nombre("11",True)
 N2: Nombre = Nombre("1111",True)
-#print(N2.addition(N1))
+#print(N2 + N1)
 #print(N2._versBase16())
 
-R1: Nombre = Nombre(3,False)
-R2: Nombre = Nombre(1,False)
-
+R1: Nombre = Nombre(10,False)
+R2: Nombre = Nombre(10,False)
 #print(N1.stats(N2,100000))
-print(R1 * R2)
+#print(R1 + R2)
 #print(N2._longueur)
+
+#               INTERFACE               #
+
+def main(page : Page):
+    page.theme_mode = "light"
+    def test(e):
+        nombre1 = Nombre(int(entree1.value),False)
+        nombre2 = Nombre(int(entree2.value),False)
+        resultat.value=f"résultat= {nombre1+nombre2}"
+        page.update()
+    entree1 = TextField(hint_text="Nombre 1")
+    entree2 = TextField(hint_text="Nombre 2")
+    resultat = Text(value="")
+    page.controls.append(Column(controls=[Row(controls=[entree1,entree2]),TextButton(text="addition",on_click=test),resultat]))
+    page.update()
+
+
+flet.app(target=main)
