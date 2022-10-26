@@ -1,2 +1,3 @@
 C:\Users\Windows\Desktop\code\visual studio\dm-nsi-classes\dm-nsi-classes\x64\Debug\dm-nsi-classes.exe
 C:\Users\Windows\Desktop\code\Github\DM-NSI-CLASSES\comparaisons\dm-nsi-classes\x64\Debug\dm-nsi-classes.exe
+C:\Users\valen\Desktop\code\githu\DM-NSI-CLASSES\comparaisons\dm-nsi-classes\x64\Debug\dm-nsi-classes.exe

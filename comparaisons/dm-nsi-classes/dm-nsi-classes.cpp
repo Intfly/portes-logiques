@@ -17,7 +17,7 @@ int main(){
         std::cout << std::to_string(i) << std::endl;
     }*/
     //x.logic_and(y).afficher();
-    //std::cout << std::to_string(x.logic_not().valeur_booleenne);
+    //std::cout << std::to_string(x.logic_not().booleen);
 
     return 0;
 }

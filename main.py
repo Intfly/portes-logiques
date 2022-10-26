@@ -97,7 +97,7 @@ class Nombre(Gate):
         return binaire
         
     def __add__(self, Nombre2):
-        N1:str = "0"+str(self.nombre)#un 0 au début permet de palier les problèmes de dépassements si le nombre en binaire ne comporte que des bits True
+        N1:str = "0"+str(self.nombre)#un 0 au début permet de palier les problèmes de dépassements si le nombre en binaire ne comporte que des bits True e.g:15(1111),7(111)
         N2:str = "0"+str(Nombre2.nombre)
         inter = (0,0)
         resultat = ""
@@ -108,7 +108,7 @@ class Nombre(Gate):
             longueurMax = self._longueur
             N2 = "0"*(longueurMax-Nombre2._longueur) + N2
         for i in range(self._longueur+1):
-            P = Gate(int(N1[len(N1)-i-1]))
+            P = Gate(int(N1[len(N1)-i-1]))#conversion en integer car la conversion d'une string en booleen renvoie False si la string est vide, True sinon. Or, ce n'est pas le comportement attendu dans ce cas de figure, la conversion en integer est donc nécessaire.
             Q = Gate(int(N2[len(N2)-i-1]))
             Cin = Gate(bool(int(inter[0])))
             inter = P.circuit_additionneur(Q,Cin)
@@ -144,7 +144,7 @@ class Nombre(Gate):
         for i in range(len(t1)):
             m1+= t1[i]
             m2 += t2[i]
-        return m1/len(t1)*10000, m2/len(t2)*10000
+        return m1/len(t1), m2/len(t2)
 
 
 
