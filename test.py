@@ -1,40 +1,13 @@
 import flet
-from flet import AppBar, ElevatedButton, Page, Text, View, colors
+from flet import IconButton, Page, Row, TextField, icons, Image
 
 def main(page: Page):
-    page.title = "Routes Example"
+    page.title = "Flet counter example"
+    page.vertical_alignment = "center"
+    page.theme_mode = "light"
 
-    def route_change(route):
-        page.views.clear()
-        page.views.append(
-            View(
-                "/",
-                [
-                    AppBar(title=Text("Flet app"), bgcolor=colors.SURFACE_VARIANT),
-                    ElevatedButton("Visit Store", on_click=lambda _: page.go("/store")),
-                ],
-            )
-        )
-        if page.route == "/store":
-            page.views.append(
-                View(
-                    "/store",
-                    [
-                        AppBar(title=Text("Store"), bgcolor=colors.SURFACE_VARIANT),
-                        ElevatedButton("Go Home", on_click=lambda _: page.go("/")),
-                    ],
-                )
-            )
-        page.update()
+    page.add(Image(src="https://images.unsplash.com/photo-1666811260863-560f6b6e0e29?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=1100&q=60"))
+    page.update()
+    
 
-    def view_pop(view):
-        page.views.pop()
-        top_view = page.views[-1]#dernier element
-        page.go(top_view.route)
-
-    page.on_route_change = route_change
-    page.on_view_pop = view_pop
-    page.go(page.route)
-
-
-flet.app(target=main, view=flet.WEB_BROWSER)
+flet.app(target=main)

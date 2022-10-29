@@ -1,4 +1,5 @@
 from gate import *
+import time
 
 class Nombre:
     def __init__(self,Nombre,est_binaire):

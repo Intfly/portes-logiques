@@ -30,9 +30,9 @@ N2: Nombre = Nombre("1111",True)
 R1: Nombre = Nombre(10,False)
 R2: Nombre = Nombre(10,False)
 #print(N1.stats(N2,100000))
-print(R1 + R2)
+#print(R1 + R2)
 #print(N2._longueur)
 
 #               INTERFACE               #
 
-#flet.app(target=main)
+flet.app(target=main,assets_dir="assets")
