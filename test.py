@@ -288,9 +288,22 @@ def main(page: Page):
 
 #flet.app(target=main)
 
-ty="abc"
-inter =""
-for i in range(len(ty)):
-    inter=inter+ty[i].upper()
-ty=inter
-print(ty[0:2])
+phrase = "(A+B)"
+morgan = False
+if phrase[0]=="(" and phrase[1] in ["A","B","C"]:
+    print("ok")
+    if phrase[2]=="n" and phrase[3]in["+","·"] and phrase[4] in ["A","B","C"]:
+        print("ok2")
+        if phrase[5]=="n" and phrase[6]==")":
+            morgan=True
+        elif phrase[5] ==")":
+            morgan=True
+    if phrase[2]in["+","·"] and phrase[3] in ["A","B","C"]:
+        print("ok3")
+        if phrase[4]=="n" and phrase [5]==")":
+            morgan= True
+        elif phrase [4]==")":
+            morgan = True
+
+print(morgan)
+

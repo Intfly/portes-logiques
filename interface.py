@@ -65,38 +65,95 @@ def main(page : Page):
                     self.calcul=""
                     self.switch_symbol= Text("mode")
                     self.ope = [""]
+                    self.ouverte=0
                 
                 def action_boutons(self,e):
                     operations=["not","or","and","xnor","xor","nor","nand"]
-                    if len(self.ope)==1: self.resultat.value ="out= "
+                    if len(self.ope)==1: self.resultat.value ="out= "#permet d'enlever le A and B par défaut. Il y a déjà un élement dans self.ope donc on compare la longueur avec 1
                     for i in range(len(operations)):#le but ici est d'itérer parmi les boutons possibles et de changer l'affichage en conséquence
+                        
                         if e.control.data == operations[i]:
                             if self.ope[-1] in operations[1:] or e.control.data==self.ope[-1]:#permet d'empécher que deux signes se suivent sans lettre intermédiaire
                                 break
                             operations_calcul=[u"\u0305","+","·","⊙","⊕","",""]#0305 correspond au code Unicode de la barre horizontale sur un élément.
-                            if e.control.data == "not" and self.ope[-1] in ["(",")"]:#distribue le signe not sur tous les élements de la parenthèse
+                            
+                            
+                            #les lignes suivantes décrivent le cas où le not doit être distribué sur l'ensemble de la parenthèse
+                            if e.control.data == "not" and self.ope[-1] in ["(",")"]:
                                 inter=""#l'assignation par index n'est pas possible pour les strings, il faut donc créer une variable intermédiaire pour contenir les nouveaux élements.
-                                for i in range(5,len(self.resultat.value)):
-                                    inter = f"{inter}{self.resultat.value[i]}{operations_calcul[0]}"
-                                    if self.resultat.value[i]==u"\u0305":
-                                        inter = inter[:-3]#enlève la barre existante si l'élement a déjà une barre, la ligne deux ligne au dessus rajoute deux barre, on en enlève donc 3.
+                                morgan = False
+                                for i in range(5,len(self.resultat.value)):#le start à 5 permet d'éviter le "out= "
+                                    #nous devons traiter le cas où l'expression correspond à une des loi de morgan, auquel cas nous pouvons simplifier l'expression
+                                    #nous vérifions donc si l'une des lois de morgan est verifiée par disjonction des cas.
+                                    if self.resultat.value[i]=="(" and self.resultat.value[i+1] in ["A","B","C"]:
+                                        if self.resultat.value[i+2]=="n" and self.resultat.value[i+3]in["+","·"] and self.resultat.value[i+4] in ["A","B","C"]:
+                                            if self.resultat.value[i+5]=="n" and self.resultat.value[i+6]==")":
+                                                morgan=True
+                                            elif self.resultat.value[i+5] ==")":
+                                                morgan=True
+                                        if self.resultat.value[i+2]in["+","·"] and self.resultat.value[i+3] in ["A","B","C"]:
+                                            if self.resultat.value[i+4]=="n" and self.resultat.value [i+5]==")":
+                                                morgan= True
+                                            elif self.resultat.value [i+4]==")":
+                                                morgan = True
+                                    if self.resultat.value[i]=="(":
+                                        print(morgan)
+                                    if morgan:
+                                        if self.resultat.value[i]==u"\u0305":
+                                            pass
+                                        elif self.resultat.value[i] in ["+","·"]:
+                                            dico_morgan={"+":"·","·":"+"}
+                                            inter += f'{dico_morgan[self.resultat.value[i]]}'
+                                        elif self.resultat.value[i] in ["A","B","C"]:
+                                            inter+=f"{self.resultat.value[i]}{operations_calcul[0]}"
+                                        elif self.resultat.value[i] in ["(",")"]:
+                                            inter+=f"{self.resultat.value[i]}"
+                                    #cette instruction conditionelle est exécutée lorsque les lois de Morgan ne sont pas respectées
+                                    else:
+                                        inter = f"{inter}{self.resultat.value[i]}{operations_calcul[0]}"#cas géneral
+                                        if self.resultat.value[i] == u"\u0305":
+                                            inter = inter[:-1]#la ligne deux ligne au dessus rajoute deux barre, on en enlève donc 1.
+                                    if self.resultat.value[i] == ")":morgan = False#remet la valeur booléenne à son état initial après la parenthèse
                                 self.resultat.value = f"out= {inter}"
+                            
+
+                            #les lignes suivantes décrivent le cas où le bouton a un symbole différent de not pour data out que le not ne doit pas être distribué.
                             else:
                                 if len(self.ope)==1: self.resultat.value ="out= A"#place automatiquement la lettre A
                                 self.resultat.value=f"out= {self.resultat.value[5:]}{operations_calcul[i]}"#[5:]permet d'enlever le "out=" dans la valeur du texte affiché.
                             self.ope.append(e.control.data)
                             break
-                        elif e.control.data in ["(",")"]:#faire les 2 indépendamment-> pour parenthèse ouverte ça la close direct
-                            self.resultat.value=f"out= ({self.resultat.value[5:]})"
+
+
+                        #les lignes suivantes décrivent le cas où le bouton a une parenthèse pour data
+                        elif e.control.data in ["(",")"]:
+                            if  (e.control.data == "("and self.ope[-1] in ["A","B","C","not",")"]) or (e.control.data == ")"and self.ope[-1] in operations[1:]+[")"]) or (self.ope[-1]=="not"and self.ope[-2]==")"):#empêche les erreurs d'inattention
+                                break
+                            if e.control.data == "(":
+                                self.ouverte+= 1
+                                self.resultat.value=f"out= {self.resultat.value[5:]}("
+                            elif e.control.data ==")" and self.ouverte >0:
+                                self.resultat.value=f"out= {self.resultat.value[5:]})"
+                                self.ouverte-= 1
+                            else:
+                                self.resultat.value=f"out= ({self.resultat.value[5:]})"
                             self.ope.append(e.control.data)
                             break
+
+
+                        #les lignes suivantes décrivent le cas où le bouton a une lettre pour data
                         elif e.control.data in ["A","B","C"]:
-                            if self.ope[-1] in ["A","B","C","not","(",")"]:#permet d'empécher que deux lettres se suivent sans signe intermédiaire.
+                            if self.ope[-1] in ["A","B","C","not",")"]:#permet d'empécher que deux lettres se suivent sans signe intermédiaire.
                                 break
                             self.resultat.value = f"out= {self.resultat.value[5:]}{e.control.data}"
                             self.ope.append(e.control.data)
                             break
+
+                    print("\n\n")
                     page.update()
+
+
+
                 def gate(self,nom,etat,texte):
                     if etat:
                         return TextButton(
@@ -138,10 +195,14 @@ def main(page : Page):
             page.views.append(calculatrice().calc())
         page.update()
 
+
+
     def view_pop(view):
         page.views.pop()#supprime la dernière vue, la vue principale actuelle.
         top_view = page.views[-1]#dernier element-> la dernière vue ajoutee devient la vue principale.
         page.go(top_view.route)#changement de vue.
+
+
 
     page.on_route_change = route_change
     page.on_view_pop = view_pop
