@@ -286,4 +286,11 @@ def main(page: Page):
     page.add(calc)
 
 
-flet.app(target=main)
+#flet.app(target=main)
+
+ty="abc"
+inter =""
+for i in range(len(ty)):
+    inter=inter+ty[i].upper()
+ty=inter
+print(ty[0:2])

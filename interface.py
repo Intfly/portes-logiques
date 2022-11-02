@@ -64,10 +64,38 @@ def main(page : Page):
                     self.resultat= Text(value="out= A+B",size=30)
                     self.calcul=""
                     self.switch_symbol= Text("mode")
+                    self.ope = [""]
                 
                 def action_boutons(self,e):
-                    self.resultat.value=e.control.data
-                    print(f"e.data:{e.data}")
+                    operations=["not","or","and","xnor","xor","nor","nand"]
+                    if len(self.ope)==1: self.resultat.value ="out= "
+                    for i in range(len(operations)):#le but ici est d'itérer parmi les boutons possibles et de changer l'affichage en conséquence
+                        if e.control.data == operations[i]:
+                            if self.ope[-1] in operations[1:] or e.control.data==self.ope[-1]:#permet d'empécher que deux signes se suivent sans lettre intermédiaire
+                                break
+                            operations_calcul=[u"\u0305","+","·","⊙","⊕","",""]#0305 correspond au code Unicode de la barre horizontale sur un élément.
+                            if e.control.data == "not" and self.ope[-1] in ["(",")"]:#distribue le signe not sur tous les élements de la parenthèse
+                                inter=""#l'assignation par index n'est pas possible pour les strings, il faut donc créer une variable intermédiaire pour contenir les nouveaux élements.
+                                for i in range(5,len(self.resultat.value)):
+                                    inter = f"{inter}{self.resultat.value[i]}{operations_calcul[0]}"
+                                    if self.resultat.value[i]==u"\u0305":
+                                        inter = inter[:-3]#enlève la barre existante si l'élement a déjà une barre, la ligne deux ligne au dessus rajoute deux barre, on en enlève donc 3.
+                                self.resultat.value = f"out= {inter}"
+                            else:
+                                if len(self.ope)==1: self.resultat.value ="out= A"#place automatiquement la lettre A
+                                self.resultat.value=f"out= {self.resultat.value[5:]}{operations_calcul[i]}"#[5:]permet d'enlever le "out=" dans la valeur du texte affiché.
+                            self.ope.append(e.control.data)
+                            break
+                        elif e.control.data in ["(",")"]:#faire les 2 indépendamment-> pour parenthèse ouverte ça la close direct
+                            self.resultat.value=f"out= ({self.resultat.value[5:]})"
+                            self.ope.append(e.control.data)
+                            break
+                        elif e.control.data in ["A","B","C"]:
+                            if self.ope[-1] in ["A","B","C","not","(",")"]:#permet d'empécher que deux lettres se suivent sans signe intermédiaire.
+                                break
+                            self.resultat.value = f"out= {self.resultat.value[5:]}{e.control.data}"
+                            self.ope.append(e.control.data)
+                            break
                     page.update()
                 def gate(self,nom,etat,texte):
                     if etat:
@@ -75,7 +103,7 @@ def main(page : Page):
                             content=Container(content=Image(src=f"\calc\{nom}.png"),width=67,height=90,bgcolor="#10000000",border_radius=10,padding=padding.symmetric(horizontal=10),alignment=alignment.center,),
                             on_click=self.action_boutons,
                             style=ButtonStyle(padding=padding.only(),overlay_color="#00000000"),
-                            data=0)
+                            data=nom)
                     if texte:
                         return TextButton(
                             content=Container(content=Text(value=nom,size=40),width=67,height=90,bgcolor="#10000000",border_radius=10,padding=padding.symmetric(horizontal=10),alignment=alignment.center,),
