@@ -1,4 +1,3 @@
-import time
 import flet
 from nombre import *
 from interface import *
@@ -28,8 +27,8 @@ N2: Nombre = Nombre("1111",True)
 #print(N2._versBase16())
 
 R1: Nombre = Nombre(10,False)
-R2: Nombre = Nombre(10,False)
-#print(N1.stats(N2,100000))
+R2: Nombre = Nombre(30,False)
+#print(N1.stats(R2,100))
 #print(R1 + R2)
 #print(N2._longueur)
 

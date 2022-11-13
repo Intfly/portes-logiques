@@ -3,6 +3,15 @@ import time
 
 class Nombre:
     def __init__(self,Nombre,est_binaire):
+        """
+        Le constructeur de la classe prend en argument un nombre en base 10 sous la forme d’un int ou un nombre en base 2 sous la forme d’une string. 
+        Il prend aussi une valeur booléenne est_binaire décrivant le premier argument. 
+        Ce constructeur convertit en binaire le nombre s’il ne l’est pas.
+        """
+        assert type(Nombre) == int or type(Nombre) == str
+        if type(Nombre) == int:
+            assert Nombre >= 0
+        assert type(est_binaire) == bool
         self._longueur = self._calculLongueur(Nombre,est_binaire)
         if est_binaire:
             self.nombre = Nombre
@@ -11,9 +20,16 @@ class Nombre:
         self._est_binaire = True
 
     def __str__(self):
+        """
+        renvoie une description de la valeur de l’instance
+        """
         return f"la valeur de l'instance est: {self.nombre}"
 
     def _calculLongueur(self,nombre,est_binaire):
+        """
+        renvoie la longueur du nombre qu’il soit binaire ou non.
+        nombre est un int ou une string et est_binaire est un booléen.
+        """
         if est_binaire:#si il est binaire alors on renvoie la longueur de la string
             return len(nombre)
         else: #sinon on regarde la puissance de 2 la plus élevée du nombre
@@ -25,6 +41,10 @@ class Nombre:
             return l
 
     def _versBinaire(self, nombre):
+        """
+        convertit un nombre en binaire. 
+        nombre est un int.
+        """
         binaire:str = ""
         for i in range(self._longueur):
             if nombre >= 2**(self._longueur-i-1):
@@ -35,7 +55,11 @@ class Nombre:
         return binaire
         
     def __add__(self, Nombre2):
-        N1:str = "0"+str(self.nombre)#un 0 au début permet de palier les problèmes de dépassements si le nombre en binaire ne comporte que des bits True e.g:15(1111),7(111)
+        assert type(Nombre2) == Nombre
+        """
+        renvoie la somme de deux instances de la classe Nombre sous la forme d’un entier. Et ce, grâce au circuit additionneur de la classe Gate. 
+        Nombre2 est une instance de la classe Nombre."""
+        N1:str = "0"+str(self.nombre)#un 0 à gauche permet de palier les problèmes de dépassements si le nombre en binaire ne comporte que des bits True e.g:15(1111),7(111)
         N2:str = "0"+str(Nombre2.nombre)
         inter = (0,0)
         resultat = ""
@@ -45,27 +69,29 @@ class Nombre:
         else:
             longueurMax = self._longueur
             N2 = "0"*(longueurMax-Nombre2._longueur) + N2
-        for i in range(self._longueur+1):
+        for i in range(len(N1)):
             P = Gate(int(N1[len(N1)-i-1]))#conversion en integer car la conversion d'une string en booleen renvoie False si la string est vide, True sinon. Or, ce n'est pas le comportement attendu dans ce cas de figure, la conversion en integer est donc nécessaire.
             Q = Gate(int(N2[len(N2)-i-1]))
             Cin = Gate(bool(int(inter[0])))
             inter = P.circuit_additionneur(Q,Cin)
             resultat = str(int(inter[1])) + resultat
-        return Nombre(resultat, True)._versBase16(longueurMax+1)#incrémentation nécessaire afin de ne pas effectuer de dépassements
+        return Nombre(resultat, True)._versBase10()#incrémentation nécessaire afin de ne pas effectuer de dépassements
 
-    def _versBase16(self,longueur):
+    def _versBase10(self):
+        """
+        renvoie le nombre de l’instance en base10. 
+        """
         return int(str(self.nombre),2)#la méthode int() peut uniquement convertir des String en int, la type de self.nombre est un integer, il faut donc le convertir en string afin de le reconvertir en base 2
-        base16 = 0
-        for i in range(longueur):
-            print(i,longueur,self.nombre[i])
-            base16+= int(self.nombre[i])*2**(longueur-i-1)
-        return base16
-        """
-        sinon, la méthode int() possède un argument optionnel permettant la conversion de son argument requis en base 16. Nous pouvons simplement écrire:
-        
-        """
+
     
     def stats(self, nombre2, iterations):
+        """
+        renvoie un tuple contentant le temps d'exection moyen de l'addition de deux instance de la classe nombre, une fois en utilisant la méthode __add__ et une fois en utilisant l'opérateur présent nativement dans python
+        nombre2 est une instance de la classe nombre et intérations est in int donnant le nombre d'itérations de la boucle
+        """
+        assert type(iterations) == int
+        assert iterations >0
+        assert type(nombre2) == Nombre
         t1= []
         t2= []
         for _ in range(iterations):
@@ -81,4 +107,6 @@ class Nombre:
         for i in range(len(t1)):
             m1+= t1[i]
             m2 += t2[i]
-        return m1/len(t1), m2/len(t2)
+        return m1/iterations, m2/iterations
+
+

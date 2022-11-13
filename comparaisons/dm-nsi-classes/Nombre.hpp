@@ -9,6 +9,6 @@ class Nombre{
 		}
 		
 		std::string addition(Nombre Nombre2);
-		std::vector<int> stats(Nombre Nombre2, int iterations);
+		long stats(Nombre Nombre2, int iterations);
 };
 

@@ -1,4 +1,2 @@
-﻿  Nombre.cpp
-C:\Users\valen\Desktop\code\githu\DM-NSI-CLASSES\comparaisons\dm-nsi-classes\Nombre.cpp(13,32): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
-C:\Users\valen\Desktop\code\githu\DM-NSI-CLASSES\comparaisons\dm-nsi-classes\Nombre.cpp(22,32): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
+﻿  dm-nsi-classes.cpp
   dm-nsi-classes.vcxproj -> C:\Users\valen\Desktop\code\githu\DM-NSI-CLASSES\comparaisons\dm-nsi-classes\x64\Debug\dm-nsi-classes.exe
