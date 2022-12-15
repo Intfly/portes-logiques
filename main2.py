@@ -1,3 +1,223 @@
+import flet
+import time
+
+class Gate:
+    def __init__(self,valeur_bouleenne: bool,operation = None, y=None):
+        """
+        Le constructeur de la classe prend en argument la valeur booléenne de l’instance, ainsi que deux arguments permettant de réaliser des opérations dès l’initialisation de l’instance.
+        valeur_booleenne est une valeur booléenne, operation, une string et y un autre valeur booléenne.
+        """
+        self.booleen: bool = valeur_bouleenne
+        if operation != None:
+            G2 = Gate(y)
+            ope={"not":self._logic_not(),"nand":self._logic_nand(G2),"nor":self._logic_nor(G2),"and":self._logic_and(G2),"or":self._logic_or(G2),"xor":self._logic_xor(G2),"xnor":self._logic_xnor(G2)}
+            self.booleen= ope[operation].booleen
+
+    
+    def __str__(self):
+        """
+        renvoie une phrase détaillant la valeur booléenne de l’instance.
+        """
+        return f"valeur booléenne: {self.booleen}"
+
+    def _logic_not(self):
+        """
+        renvoie une instance de la classe Gate ayant pour valeur booléenne l’inverse de celle de la première instance.
+        """
+        if self.booleen:
+            return Gate(False)
+        return Gate(True)
+    
+    def _logic_nand(self,Q):
+        """
+        renvoie l’inverse de l’intersection de self et Q sous la forme d’une instance de la classe Gate. 
+        Q est une instance de la classe Gate.
+        """
+        assert type(Q) == Gate
+        if self.booleen:
+            if Q.booleen:
+                return Gate(False)
+        return Gate(True)
+        """
+        équivalent à:
+        return Gate(self.booleen and Q.booleen)
+        """
+   
+    def _logic_nor(self, Q):
+        """
+        renvoie l’inverse de l’union de self et Q sous la forme d’une instance de la classe Gate. 
+        Q est une instance de la classe Gate.
+        """
+        assert type(Q) == Gate
+        if self._logic_not().booleen:           
+            if Q._logic_not().booleen:
+                return Gate(True)     
+        return Gate(False)
+        """
+        équivalent à :
+        return Gate(not self.booleen and not Q.booleen)
+        """
+    
+
+    def _logic_and(self,Q):
+        """
+        renvoie l’intersection de self et Q sous la forme d’une instance de la classe Gate. 
+        Q est une instance de la classe Gate.
+        """
+        assert type(Q) == Gate
+        A = self._logic_nor(self)
+        B = Q._logic_nor(Q)
+        return A._logic_nor(B)
+    
+    def _logic_or(self,Q):
+        """
+        renvoie l’union de self et Q sous la forme d’une instance de la classe Gate. 
+        Q est une instance de la classe Gate.
+        """
+        assert type(Q) == Gate
+        A = self._logic_nand(self)
+        B = Q._logic_nand(Q)
+        return A._logic_nand(B)
+
+    def _logic_xor(self,Q):
+        """
+        renvoie l'union privée de la réunion de self et Q  sous la forme d’une instance de la classe Gate. 
+        Q est une instance de la classe Gate.
+        """
+        assert type(Q) == Gate
+        A = self._logic_and(Q._logic_not())
+        B = Q._logic_and(self._logic_not())
+        return A._logic_or(B)
+
+    def _logic_xnor(self,Q):
+        """
+        renvoie l'inverse de l'union privée de la réunion de self et Q sous la forme d’une instance de la classe Gate. 
+        Q est une instance de la classe Gate.
+        """
+        return self._logic_xor(Q)._logic_not()
+
+    def circuit_additionneur(self,Q,Cin):
+        """
+        assert type(Q) == Gate
+        renvoie un tuple contenant l’addition binaire de self, Q et Cin. 
+        Q et Cin sont des instances de la classe Gate.
+        """
+        assert type(Q) == Gate
+        E1 = self._logic_xor(Q)
+        S = E1._logic_xor(Cin).booleen
+        E2 = E1._logic_and(Cin)
+        E3 = self._logic_and(Q)
+        Cout = E2._logic_or(E3).booleen
+        return Cout, S
+
+class Nombre:
+    def __init__(self,Nombre,est_binaire):
+        """
+        Le constructeur de la classe prend en argument un nombre en base 10 sous la forme d’un int ou un nombre en base 2 sous la forme d’une string. 
+        Il prend aussi une valeur booléenne est_binaire décrivant le premier argument. 
+        Ce constructeur convertit en binaire le nombre s’il ne l’est pas.
+        """
+        assert type(Nombre) == int or type(Nombre) == str
+        if type(Nombre) == int:
+            assert Nombre >= 0
+        assert type(est_binaire) == bool
+        self._longueur = self._calculLongueur(Nombre,est_binaire)
+        if est_binaire:
+            self.nombre = Nombre
+        else:
+            self.nombre = self._versBinaire(Nombre)
+        self._est_binaire = True
+
+    def __str__(self):
+        """
+        renvoie une description de la valeur de l’instance
+        """
+        return f"la valeur de l'instance est: {self.nombre}"
+
+    def _calculLongueur(self,nombre,est_binaire):
+        """
+        renvoie la longueur du nombre qu’il soit binaire ou non.
+        nombre est un int ou une string et est_binaire est un booléen.
+        """
+        if est_binaire:#si il est binaire alors on renvoie la longueur de la string
+            return len(nombre)
+        else: #sinon on regarde la puissance de 2 la plus élevée du nombre
+            l:int = 0
+            nombre = int(nombre)
+            while nombre-(2**l)>= nombre/2:
+                l+=1
+            l+=1
+            return l
+
+    def _versBinaire(self, nombre):
+        """
+        convertit un nombre en binaire. 
+        nombre est un int.
+        """
+        binaire:str = ""
+        for i in range(self._longueur):
+            if nombre >= 2**(self._longueur-i-1):
+                binaire+="1"
+                nombre -=(2**(self._longueur-i-1))
+            else:
+                binaire+="0"
+        return binaire
+        
+    def __add__(self, Nombre2):
+        assert type(Nombre2) == Nombre
+        """
+        renvoie la somme de deux instances de la classe Nombre sous la forme d’un entier. Et ce, grâce au circuit additionneur de la classe Gate. 
+        Nombre2 est une instance de la classe Nombre."""
+        N1:str = "0"+str(self.nombre)#un 0 à gauche permet de palier les problèmes de dépassements si le nombre en binaire ne comporte que des bits True e.g:15(1111),7(111)
+        N2:str = "0"+str(Nombre2.nombre)
+        inter = (0,0)
+        resultat = ""
+        if Nombre2._longueur > self._longueur:
+            longueurMax = Nombre2._longueur
+            N1 = "0"*(longueurMax-self._longueur) + N1#ajoute un 0 au début du nombre le plus petit afin de qu'ils aient la même longueur
+        else:
+            longueurMax = self._longueur
+            N2 = "0"*(longueurMax-Nombre2._longueur) + N2
+        for i in range(len(N1)):
+            P = Gate(int(N1[len(N1)-i-1]))#conversion en integer car la conversion d'une string en booleen renvoie False si la string est vide, True sinon. Or, ce n'est pas le comportement attendu dans ce cas de figure, la conversion en integer est donc nécessaire.
+            Q = Gate(int(N2[len(N2)-i-1]))
+            Cin = Gate(bool(int(inter[0])))
+            inter = P.circuit_additionneur(Q,Cin)
+            resultat = str(int(inter[1])) + resultat
+        return Nombre(resultat, True)._versBase10()#incrémentation nécessaire afin de ne pas effectuer de dépassements
+
+    def _versBase10(self):
+        """
+        renvoie le nombre de l’instance en base10. 
+        """
+        return int(str(self.nombre),2)#la méthode int() peut uniquement convertir des String en int, la type de self.nombre est un integer, il faut donc le convertir en string afin de le reconvertir en base 2
+
+    
+    def stats(self, nombre2, iterations):
+        """
+        renvoie un tuple contentant le temps d'exection moyen de l'addition de deux instance de la classe nombre, une fois en utilisant la méthode __add__ et une fois en utilisant l'opérateur présent nativement dans python
+        nombre2 est une instance de la classe nombre et intérations est in int donnant le nombre d'itérations de la boucle
+        """
+        assert type(iterations) == int
+        assert iterations >0
+        assert type(nombre2) == Nombre
+        t1= []
+        t2= []
+        for _ in range(iterations):
+            dbt = time.perf_counter()
+            self + nombre2
+            t1.append(time.perf_counter() - dbt)
+            N1,N2 = self.nombre,nombre2.nombre
+            dbt2 = time.perf_counter()
+            N1 + N2
+            t2.append(time.perf_counter() - dbt2)
+        m1=0
+        m2=0
+        for i in range(len(t1)):
+            m1+= t1[i]
+            m2 += t2[i]
+        return m1/iterations, m2/iterations
+
 from flet import (ButtonStyle, Column, Container, IconButton, Image,
                   Page, Row, Text, TextButton, TextField, UserControl, View,
                   alignment, margin, padding,GridView)
@@ -643,3 +863,32 @@ def main(page : Page): # page est une instace de la classe Page
     page.on_route_change = route_change
     page.on_view_pop = view_pop
     page.go(page.route)
+
+#               TESTS               #
+
+P: Gate = Gate(True)
+Q: Gate = Gate(False)
+Cin: Gate = Gate(True)
+#print(P._logic_not())
+#print(P._logic_nand(Q))
+#print(P._logic_nor(Q))
+#print(P._logic_and(Q))
+#print(P._logic_or(Q))
+#print(P._logic_xor(Q))
+#print(P._logic_xnor(Q))
+#print(P.circuit_additionneur(Q, Cin))
+
+N1: Nombre = Nombre("11",True)
+N2: Nombre = Nombre("1111",True)
+#print(N2 + N1)
+#print(N2._versBase16())
+
+R1: Nombre = Nombre(10,False)
+R2: Nombre = Nombre(30,False)
+#print(N1.stats(R2,100))
+#print(R1 + R2)
+#print(N2._longueur)
+
+#               INTERFACE               #
+
+flet.app(target=main,assets_dir="assets")
