@@ -1,4 +1,4 @@
-# DM-NSI-CLASSES
+# Portes logiques
 
 ## 1. Objectif</br>
 Ce projet est une introduction aux portes logiques et au fonctionnement interne des ordinateurs.
